@@ -1,24 +1,25 @@
 import React, { useState } from 'react';
-import { useAssessment } from '../context/AssessmentContext';
-
-const MOCK_CURRICULUM = [
-    { id: 1, titulo: 'Fundamentos y Sintaxis Básica' },
-    { id: 2, titulo: 'Estructuras de Control y Funciones' },
-    { id: 3, titulo: 'Programación Orientada a Objetos' },
-    { id: 4, titulo: 'Estructuras de Datos Avanzadas' },
-    { id: 5, titulo: 'Manejo de Errores y Excepciones' },
-    { id: 6, titulo: 'Asincronía y Concurrencia' },
-    { id: 7, titulo: 'Bases de Datos y ORMs' },
-    { id: 8, titulo: 'Arquitectura y APIs REST' },
-];
+// Cambiamos la importación para usar el contexto de proyecto real
+import { useProject } from '../context/ProjectContext'; 
 
 const AssessmentScreen = ({ onNavigate }) => {
-    const { setCurriculum } = useAssessment();
+    // Extraemos el proyecto actual y la función para actualizarlo
+    const { project, setProject } = useProject(); 
     const [isSaving, setIsSaving] = useState(false);
     const [knownIndex, setKnownIndex] = useState(-1);
 
-    const topics = MOCK_CURRICULUM;
+    // Protección de renderizado: si el proyecto no ha cargado, mostramos un estado de carga
+    if (!project || !project.curriculum) {
+        return (
+            <div className="flex-1 flex items-center justify-center min-h-screen">
+                <div className="w-8 h-8 rounded-full border-2 border-[#00c8ff] border-r-transparent animate-spin"></div>
+            </div>
+        );
+    }
 
+    // Usamos el currículum real del backend
+    const topics = project.curriculum;
+    
     const handleSelectLevel = (index) => {
         setKnownIndex(index);
     };
@@ -26,18 +27,21 @@ const AssessmentScreen = ({ onNavigate }) => {
     const handleContinue = () => {
         if (isSaving) return;
         setIsSaving(true);
+        
+        // Aquí actualizamos los datos reales del project
         setTimeout(() => {
-            const updatedCurriculum = topics.map((mod, index) => ({
-                ...mod,
-                completed: index <= knownIndex
-            }));
-            setCurriculum(updatedCurriculum);
+            const updatedCurriculum = project.curriculum.filter((modulo, index) => index > knownIndex);
+
+            setProject({
+                ...project,
+                curriculum: updatedCurriculum
+            });
+
             setIsSaving(false);
+            
             if (onNavigate) onNavigate();
         }, 800);
     };
-
-    console.log('AssessmentScreen rendered with data:', assessmentData);
 
     return (
         <div className="flex-1 flex flex-col items-center justify-start w-full max-w-5xl mx-auto px-4 py-8 md:py-12 animate-in fade-in duration-700 relative z-10">
@@ -99,7 +103,8 @@ const AssessmentScreen = ({ onNavigate }) => {
 
                         return (
                             <div
-                                key={topic.id}
+                                // Cambiamos la key a topic.moduleId
+                                key={topic.moduleId} 
                                 className={`flex items-center group cursor-pointer py-4 md:py-6 transition-all duration-300 ${isKnown ? 'opacity-50' : 'opacity-100'}`}
                                 onClick={() => handleSelectLevel(index)}
                             >

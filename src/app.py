@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from src.llama_index_template import initialize_index, query_index
 import uvicorn
@@ -33,10 +34,10 @@ class CurriculumRequest(BaseModel):
 
 class Module(BaseModel):
     titulo: str = Field(..., min_length=1)
-    moduleId: int
+    moduleId: int  
     nivel_dificultad: int
-    tarea_aprendizaje: int
-    ejercicios: List[Any]
+    tarea_aprendizaje: str  # <-- CAMBIO 1: Cambiado a 'str' porque la IA devuelve "React", "Node", etc.
+    ejercicios: List[Any] = [] # <-- CAMBIO 2: Añadido '=[]' para que por defecto sea una lista vacía
     was_completed: bool = False
 
 
@@ -168,11 +169,13 @@ def create_client():
         raise HTTPException(500, detail=str(e))
 
 @app.post('/create_project', response_model=CurriculumResponse)
+@app.post('/create_project', response_model=CurriculumResponse)
 def create_project(payload: CurriculumRequest):
     try:
         agent_output = _call_curriculum_agent(payload.description)
         nombre_proyecto = agent_output.get("nombre")
         curriculum = agent_output.get("curriculum")
+        
         if not isinstance(nombre_proyecto, str):
             raise HTTPException(502, detail="Agent response missing 'nombre' string.")
         if not isinstance(curriculum, list):
@@ -182,20 +185,14 @@ def create_project(payload: CurriculumRequest):
             if not isinstance(item, dict):
                 raise HTTPException(502, detail=f"Curriculum item at index {index} must be an object.")
             
-            # Inyectamos el moduleId secuencial
-            item["moduleId"] = str(index)
+            # Inyectamos los campos que la IA no nos da o que son valores iniciales
+            item["moduleId"] = index  # Se inyecta como entero
+            item["was_completed"] = False
+            item["ejercicios"] = []   # Garantizamos que exista la clave para Firebase
             
-            # Validación de las claves requeridas para cada módulo
+            # Validación de las claves requeridas que sí debe devolver la IA
             if "titulo" not in item or "nivel_dificultad" not in item or "tarea_aprendizaje" not in item:
                 raise HTTPException(502, detail=f"Topic at index {index} is missing required fields.")
-            
-            # Inyectamos el moduleId secuencial. Lo convertimos a string según tu esquema previo.
-            item["moduleId"] = str(index)
-            item["was_completed"] = False
-            
-            # Validación ajustada: verificamos las claves que realmente esperamos de la IA
-            if "titulo" not in item or "nivel_dificultad" not in item or "tarea_aprendizaje" not in item:
-                raise HTTPException(502, detail="Topic must include titulo, nivel_dificultad, and tarea_aprendizaje.")
 
         curriculum_record = {
             "userId": payload.userId, 
@@ -207,6 +204,7 @@ def create_project(payload: CurriculumRequest):
         curriculum_record["id"] = curriculum_id
 
         return curriculum_record
+        
     except Exception as e:
         if isinstance(e, HTTPException):
             raise

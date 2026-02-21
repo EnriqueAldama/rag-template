@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { createClient } from '../api/client';
+import { createClient, createProject } from '../api/client';
 import { useAssessment } from '../context/AssessmentContext';
+import { useUser } from '../context/UserContext';
+import { useProject } from '../context/ProjectContext';
 
 const SUGGESTED_TAGS = [
     'Desarrollo Web',
@@ -15,7 +17,8 @@ const SearchScreen = ({ onNavigate }) => {
     const [isFocused, setIsFocused] = useState(false);
     const [isNavigating, setIsNavigating] = useState(false);
     const [error, setError] = useState('');
-    const { setUserId, setGoalDescription } = useAssessment();
+    const { userId, setUserId } = useUser();
+    const { setProject, project } = useProject();
 
     const handleSearchChange = (e) => {
         setSearchQuery(e.target.value);
@@ -30,13 +33,28 @@ const SearchScreen = ({ onNavigate }) => {
         setIsNavigating(true);
         setError('');
         try {
-            const description = searchQuery.trim();
-            setGoalDescription(description);
             const response = await createClient();
             if (!response?.id) {
                 throw new Error('No se pudo crear el cliente.');
             }
+            const localUserId = response.id;
             setUserId(response.id);
+            // LLamada a create project
+            try {
+                const description = searchQuery.trim();
+                const payload = {
+                    description: description, 
+                    userId: localUserId
+                };
+                const response2 = await createProject(payload);
+                console.log(response2);
+                setProject(response2);
+            } catch (err) {
+                const message = err?.response?.data?.detail || err?.message || 'Error al conectar con el backend.';
+                setError(message);
+            } finally {
+                setIsNavigating(false);
+            }
             if (onNavigate) onNavigate();
         } catch (err) {
             const message = err?.response?.data?.detail || err?.message || 'Error al conectar con el backend.';
@@ -44,6 +62,7 @@ const SearchScreen = ({ onNavigate }) => {
         } finally {
             setIsNavigating(false);
         }
+
     };
 
     return (
@@ -60,7 +79,7 @@ const SearchScreen = ({ onNavigate }) => {
                     Impulsa tu <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00c8ff] to-[#0066cc]">Potencial</span>
                 </h1>
                 <p className="text-lg md:text-xl text-[#9bb3d6] max-w-2xl mx-auto font-medium">
-                    Descubre rutas de aprendizaje B2B diseñadas para transformar habilidades y escalar resultados.
+                    Descubre rutas de aprendizaje diseñadas para transformar habilidades y escalar resultados.
                 </p>
             </div>
 

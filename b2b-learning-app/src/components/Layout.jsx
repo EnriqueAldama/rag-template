@@ -31,7 +31,7 @@ const Layout = ({ children, onLogoClick, canGoBack }) => {
                             <span className="text-white font-bold text-sm tracking-tighter shadow-[0_0_10px_white]">L</span>
                         </div>
                         <span className="font-semibold text-lg tracking-tight text-[#f8fbff] hidden sm:block drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]">
-                            Lumina<span className="text-[#00c8ff] font-medium drop-shadow-[0_0_15px_rgba(0,200,255,0.5)]">B2B</span>
+                            Lumina<span className="text-[#00c8ff] font-medium drop-shadow-[0_0_15px_rgba(0,200,255,0.5)]"></span>
                         </span>
                     </div>
 

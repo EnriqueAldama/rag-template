@@ -6,6 +6,8 @@ import { AssessmentProvider } from './context/AssessmentContext';
 
 import RoadmapScreen from './components/RoadmapScreen';
 import LessonScreen from './components/LessonScreen';
+import { UserProvider } from './context/UserContext';
+import { ProjectProvider } from './context/ProjectContext';
 
 function AppContent() {
   // maintain a history stack so we can go backwards between screens
@@ -47,9 +49,13 @@ function AppContent() {
 
 function App() {
   return (
-    <AssessmentProvider>
-      <AppContent />
-    </AssessmentProvider>
+    <UserProvider>
+      <ProjectProvider>
+        <AssessmentProvider>
+          <AppContent />
+        </AssessmentProvider>
+      </ProjectProvider>
+    </UserProvider>
   );
 }
 
