@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { createClient } from '../api/client';
+import { useAssessment } from '../context/AssessmentContext';
 
 const SUGGESTED_TAGS = [
     'Desarrollo Web',
@@ -12,6 +14,8 @@ const SearchScreen = ({ onNavigate }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [isFocused, setIsFocused] = useState(false);
     const [isNavigating, setIsNavigating] = useState(false);
+    const [error, setError] = useState('');
+    const { setUserId, setGoalDescription } = useAssessment();
 
     const handleSearchChange = (e) => {
         setSearchQuery(e.target.value);
@@ -21,14 +25,25 @@ const SearchScreen = ({ onNavigate }) => {
         setSearchQuery(tag);
     };
 
-    const handleStartRoute = () => {
-        if (!searchQuery.trim()) return;
+    const handleStartRoute = async () => {
+        if (!searchQuery.trim() || isNavigating) return;
         setIsNavigating(true);
-        // Simulate navigation
-        setTimeout(() => {
-            setIsNavigating(false);
+        setError('');
+        try {
+            const description = searchQuery.trim();
+            setGoalDescription(description);
+            const response = await createClient();
+            if (!response?.id) {
+                throw new Error('No se pudo crear el cliente.');
+            }
+            setUserId(response.id);
             if (onNavigate) onNavigate();
-        }, 800);
+        } catch (err) {
+            const message = err?.response?.data?.detail || err?.message || 'Error al conectar con el backend.';
+            setError(message);
+        } finally {
+            setIsNavigating(false);
+        }
     };
 
     return (
@@ -103,6 +118,18 @@ const SearchScreen = ({ onNavigate }) => {
                 >
                     Comenzar Ruta
                 </button>
+
+                {error && (
+                    <div className="w-full flex flex-col items-center gap-3">
+                        <p className="text-sm text-red-400 font-medium text-center">{error}</p>
+                        <button
+                            onClick={handleStartRoute}
+                            className="px-5 py-2 rounded-full bg-white/5 border border-white/10 text-white text-sm font-medium hover:bg-white/10 transition-all"
+                        >
+                            Reintentar
+                        </button>
+                    </div>
+                )}
 
                 {/* Tags Section */}
                 <div className="flex flex-wrap justify-center items-center gap-3">
