@@ -37,7 +37,6 @@ const AssessmentScreen = ({ onNavigate }) => {
         }, 800);
     };
 
-    console.log('AssessmentScreen rendered with data:', assessmentData);
 
     return (
         <div className="flex-1 flex flex-col items-center justify-start w-full max-w-5xl mx-auto px-4 py-8 md:py-12 animate-in fade-in duration-700 relative z-10">
@@ -137,7 +136,7 @@ const AssessmentScreen = ({ onNavigate }) => {
                                             )}
                                             {(isNext || isFirstAndUnknown) && (
                                                 <span className="self-start md:self-auto px-3 py-1 bg-white/10 text-white text-xs font-bold rounded uppercase tracking-wider border border-white/20 shadow-[0_0_10px_rgba(255,255,255,0.1)]">
-                                                    Objetivo
+                                                    No superado
                                                 </span>
                                             )}
                                         </div>
