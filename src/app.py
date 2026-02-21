@@ -152,6 +152,56 @@ def _rag_notes_for_module(module: Module) -> str:
     return retrieval_result.response
 
 
+TUTOR_SYSTEM_PROMPT = (
+    "Eres un tutor de programación experto y cercano para una plataforma de aprendizaje técnico. ",
+    "Tu misión es ayudar al alumno a entender los conceptos del ejercicio actual sin darle directamente la respuesta. "
+    "Usa el método socrático: guía con preguntas, pistas y analogías. "
+    "Sé conciso (máximo 3-4 oraciones por respuesta), amigable y usa emojis con moderación. "
+    "Responde siempre en español. "
+    "Si el alumno pide la respuesta directa, da una pista más detallada pero no la solución completa. "
+    "Si el alumno ya respondió correctamente, felicítale y profundiza en el concepto."
+)
+
+
+class TutorMessage(BaseModel):
+    role: str  # 'user' or 'assistant'
+    content: str
+
+
+class TutorChatRequest(BaseModel):
+    messages: List[TutorMessage]
+    exercise_context: str = ""  # Title/description of the current exercise
+
+
+@app.post('/tutor_chat')
+def tutor_chat(payload: TutorChatRequest):
+    try:
+        client = OpenAI()
+
+        # Build message history for OpenAI
+        system_msg = TUTOR_SYSTEM_PROMPT
+        if payload.exercise_context:
+            system_msg += f"\n\nContexto del ejercicio actual: {payload.exercise_context}"
+
+        openai_messages = [{"role": "system", "content": system_msg}]
+        for msg in payload.messages:
+            openai_messages.append({"role": msg.role, "content": msg.content})
+
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=openai_messages,
+            temperature=0.7,
+            max_tokens=200,
+        )
+
+        reply = response.choices[0].message.content
+        return {"reply": reply}
+
+    except Exception as e:
+        if isinstance(e, HTTPException):
+            raise
+        raise HTTPException(500, detail=str(e))
+
 
 @app.post('/create_client', response_model=ClientResponse)
 def create_client():

@@ -142,7 +142,7 @@ const AssessmentScreen = ({ onNavigate }) => {
                                             )}
                                             {(isNext || isFirstAndUnknown) && (
                                                 <span className="self-start md:self-auto px-3 py-1 bg-white/10 text-white text-xs font-bold rounded uppercase tracking-wider border border-white/20 shadow-[0_0_10px_rgba(255,255,255,0.1)]">
-                                                    Objetivo
+                                                    No superado
                                                 </span>
                                             )}
                                         </div>

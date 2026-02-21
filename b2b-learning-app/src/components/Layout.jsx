@@ -1,7 +1,7 @@
 import React from 'react';
 import ParticleBackground from './ParticleBackground';
 
-const Layout = ({ children, onLogoClick, canGoBack }) => {
+const Layout = ({ children, onLogoClick, onBackClick, canGoBack }) => {
     return (
         <div style={{ background: 'linear-gradient(135deg, #0a0e27 0%, #000000 50%, #0a1628 100%)' }} className="min-h-screen text-white flex flex-col font-sans selection:bg-[#0088ff]/30 relative overflow-x-hidden">
             <ParticleBackground />
@@ -12,7 +12,7 @@ const Layout = ({ children, onLogoClick, canGoBack }) => {
                     {/* Back arrow (shown when there is history) */}
                     {canGoBack && (
                         <button
-                            onClick={onLogoClick}
+                            onClick={onBackClick}
                             className="p-2 rounded-full hover:bg-white/10 transition-colors mr-4"
                             aria-label="Go back"
                         >
@@ -31,7 +31,7 @@ const Layout = ({ children, onLogoClick, canGoBack }) => {
                             <span className="text-white font-bold text-sm tracking-tighter shadow-[0_0_10px_white]">L</span>
                         </div>
                         <span className="font-semibold text-lg tracking-tight text-[#f8fbff] hidden sm:block drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]">
-                            Lumina<span className="text-[#00c8ff] font-medium drop-shadow-[0_0_15px_rgba(0,200,255,0.5)]"></span>
+                            Lumina
                         </span>
                     </div>
 

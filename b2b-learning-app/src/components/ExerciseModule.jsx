@@ -17,9 +17,9 @@ import React, { useState } from 'react';
  */
 const FillBlanksExercise = ({ exercise, userAnswer, setUserAnswer, onSubmit, showFeedback, isCorrect }) => {
     return (
-        <div className="bg-white/[0.02] border border-white/10 rounded-3xl overflow-hidden font-mono shadow-2xl relative">
+        <div className="bg-black border border-white/10 rounded-3xl overflow-hidden font-mono shadow-2xl relative">
             {/* Editor Header */}
-            <div className="bg-white/[0.03] px-4 py-3 flex items-center gap-2 border-b border-white/5">
+            <div className="bg-black/60 px-4 py-3 flex items-center gap-2 border-b border-white/10">
                 <div className="flex gap-1.5">
                     <div className="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
                     <div className="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
@@ -60,12 +60,12 @@ const FillBlanksExercise = ({ exercise, userAnswer, setUserAnswer, onSubmit, sho
             </div>
 
             {/* Actions */}
-            <div className="p-5 bg-white/[0.02] border-t border-white/5 flex justify-between items-center">
+            <div className="p-5 bg-black/60 border-t border-white/10 flex justify-between items-center">
                 <div>
                     {showFeedback && (
                         <span className={`text-sm font-medium animate-in slide-in-from-left-4 fade-in ${isCorrect ? 'text-green-400' : 'text-red-400'}`}>
-                            {isCorrect 
-                                ? (exercise.successMessage || "¡Correcto!") 
+                            {isCorrect
+                                ? (exercise.successMessage || "¡Correcto!")
                                 : (exercise.errorMessage || "Respuesta incorrecta. Intenta de nuevo.")}
                         </span>
                     )}
@@ -86,9 +86,9 @@ const FillBlanksExercise = ({ exercise, userAnswer, setUserAnswer, onSubmit, sho
  */
 const FillCodeRowExercise = ({ exercise, userAnswer, setUserAnswer, onSubmit, showFeedback, isCorrect }) => {
     return (
-        <div className="bg-white/[0.02] border border-white/10 rounded-3xl overflow-hidden shadow-2xl relative">
+        <div className="bg-black border border-white/10 rounded-3xl overflow-hidden shadow-2xl relative">
             {/* Header */}
-            <div className="bg-white/[0.03] px-6 py-4 border-b border-white/5">
+            <div className="bg-black/60 px-6 py-4 border-b border-white/10">
                 <h3 className="text-white font-semibold text-lg">Escribe la línea de código</h3>
                 <p className="text-gray-400 text-sm mt-1">{exercise.description}</p>
             </div>
@@ -106,7 +106,7 @@ const FillCodeRowExercise = ({ exercise, userAnswer, setUserAnswer, onSubmit, sh
                     <span className="w-8 text-right text-purple-400/50 mr-4 select-none pr-2">▶</span>
                     <input
                         type="text"
-                        className={`flex-1 bg-white/5 border ${showFeedback ? (isCorrect ? 'border-green-500 text-green-400' : 'border-red-500 text-red-500') : 'border-white/20 focus:border-purple-500 text-white'} rounded px-3 py-2 outline-none transition-colors duration-300 placeholder-gray-500 font-mono`}
+                        className={`flex-1 bg-black border ${showFeedback ? (isCorrect ? 'border-green-500 text-green-400' : 'border-red-500 text-red-500') : 'border-white/20 focus:border-[#00c8ff] text-white'} rounded px-3 py-2 outline-none transition-colors duration-300 placeholder-gray-500 font-mono`}
                         value={userAnswer}
                         onChange={(e) => setUserAnswer(e.target.value)}
                         placeholder={exercise.placeholder || "escribe tu código aquí..."}
@@ -125,12 +125,12 @@ const FillCodeRowExercise = ({ exercise, userAnswer, setUserAnswer, onSubmit, sh
             </div>
 
             {/* Feedback & Actions */}
-            <div className="p-5 bg-white/[0.02] border-t border-white/5 flex justify-between items-center">
+            <div className="p-5 bg-black/60 border-t border-white/10 flex justify-between items-center">
                 <div>
                     {showFeedback && (
                         <span className={`text-sm font-medium animate-in slide-in-from-left-4 fade-in ${isCorrect ? 'text-green-400' : 'text-red-400'}`}>
-                            {isCorrect 
-                                ? (exercise.successMessage || "¡Perfecto! Código funcional.") 
+                            {isCorrect
+                                ? (exercise.successMessage || "¡Perfecto! Código funcional.")
                                 : (exercise.errorMessage || "Revisa tu código.")}
                         </span>
                     )}
@@ -153,9 +153,9 @@ const TestExercise = ({ exercise, selectedOption, setSelectedOption, onSubmit, s
     const options = exercise.options || [];
 
     return (
-        <div className="bg-white/[0.02] border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
+        <div className="bg-black border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
             {/* Header */}
-            <div className="bg-white/[0.03] px-6 py-4 border-b border-white/5">
+            <div className="bg-black/60 px-6 py-4 border-b border-white/10">
                 <h3 className="text-white font-semibold text-lg">{exercise.question}</h3>
             </div>
 
@@ -173,26 +173,24 @@ const TestExercise = ({ exercise, selectedOption, setSelectedOption, onSubmit, s
                             key={optionKey}
                             onClick={() => setSelectedOption(optionKey)}
                             disabled={isDisabled}
-                            className={`w-full text-left p-4 rounded-xl border transition-all duration-300 ${
-                                isCorrectOption
+                            className={`w-full text-left p-4 rounded-xl border transition-all duration-300 ${isCorrectOption
                                     ? 'border-green-500 bg-green-500/10 text-green-400'
                                     : isWrongSelection
-                                    ? 'border-red-500 bg-red-500/10 text-red-400'
-                                    : isSelected
-                                    ? 'border-purple-500 bg-purple-500/10 text-white'
-                                    : 'border-white/10 bg-white/5 text-gray-300 hover:border-purple-500/50 hover:bg-white/10'
-                            } ${isDisabled ? 'cursor-default' : 'cursor-pointer'}`}
+                                        ? 'border-red-500 bg-red-500/10 text-red-400'
+                                        : isSelected
+                                            ? 'border-purple-500 bg-purple-500/10 text-white'
+                                            : 'border-white/10 bg-white/5 text-gray-300 hover:border-purple-500/50 hover:bg-white/10'
+                                } ${isDisabled ? 'cursor-default' : 'cursor-pointer'}`}
                         >
                             <div className="flex items-center gap-3">
-                                <span className={`w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-full font-semibold text-sm ${
-                                    isCorrectOption
+                                <span className={`w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-full font-semibold text-sm ${isCorrectOption
                                         ? 'bg-green-500/20 text-green-400 border-2 border-green-500'
                                         : isWrongSelection
-                                        ? 'bg-red-500/20 text-red-400 border-2 border-red-500'
-                                        : isSelected
-                                        ? 'bg-purple-500/20 text-purple-400 border-2 border-purple-500'
-                                        : 'bg-white/5 text-gray-400 border-2 border-white/10'
-                                }`}>
+                                            ? 'bg-red-500/20 text-red-400 border-2 border-red-500'
+                                            : isSelected
+                                                ? 'bg-purple-500/20 text-purple-400 border-2 border-purple-500'
+                                                : 'bg-white/5 text-gray-400 border-2 border-white/10'
+                                    }`}>
                                     {optionKey}
                                 </span>
                                 <span className="flex-1">{option.text}</span>
@@ -203,12 +201,12 @@ const TestExercise = ({ exercise, selectedOption, setSelectedOption, onSubmit, s
             </div>
 
             {/* Feedback & Actions */}
-            <div className="p-5 bg-white/[0.02] border-t border-white/5 flex justify-between items-center">
+            <div className="p-5 bg-black/60 border-t border-white/10 flex justify-between items-center">
                 <div className="flex-1">
                     {showFeedback && (
                         <span className={`text-sm font-medium animate-in slide-in-from-left-4 fade-in ${isCorrect ? 'text-green-400' : 'text-red-400'}`}>
-                            {isCorrect 
-                                ? (exercise.successMessage || "¡Correcto!") 
+                            {isCorrect
+                                ? (exercise.successMessage || "¡Correcto!")
                                 : (exercise.errorMessage || "Respuesta incorrecta. Intenta de nuevo.")}
                         </span>
                     )}
@@ -230,16 +228,16 @@ const TestExercise = ({ exercise, selectedOption, setSelectedOption, onSubmit, s
  */
 const WhatIfExercise = ({ exercise, userAnswer, setUserAnswer, onSubmit, showFeedback, isCorrect }) => {
     return (
-        <div className="bg-white/[0.02] border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
+        <div className="bg-black border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
             {/* Header */}
-            <div className="bg-white/[0.03] px-6 py-4 border-b border-white/5">
+            <div className="bg-black/60 px-6 py-4 border-b border-white/10">
                 <h3 className="text-white font-semibold text-lg">¿Qué sucede si...?</h3>
                 <p className="text-gray-400 text-sm mt-1">{exercise.scenario}</p>
             </div>
 
             {/* Code Display */}
             {exercise.code && (
-                <div className="p-6 font-mono text-[15px] bg-black/20 border-b border-white/5">
+                <div className="p-6 font-mono text-[15px] bg-black border-b border-white/10">
                     <pre className="text-[#cccccc] overflow-x-auto">
                         <code>{exercise.code}</code>
                     </pre>
@@ -249,10 +247,10 @@ const WhatIfExercise = ({ exercise, userAnswer, setUserAnswer, onSubmit, showFee
             {/* Question */}
             <div className="p-6">
                 <p className="text-white mb-4">{exercise.question}</p>
-                
+
                 {/* Answer Input */}
                 <textarea
-                    className={`w-full bg-white/5 border ${showFeedback ? (isCorrect ? 'border-green-500 text-green-400' : 'border-red-500 text-red-500') : 'border-white/20 focus:border-purple-500 text-white'} rounded-xl px-4 py-3 outline-none transition-colors duration-300 placeholder-gray-500 font-sans resize-none`}
+                    className={`w-full bg-black border ${showFeedback ? (isCorrect ? 'border-green-500 text-green-400' : 'border-red-500 text-red-500') : 'border-white/20 focus:border-[#00c8ff] text-white'} rounded-xl px-4 py-3 outline-none transition-colors duration-300 placeholder-gray-500 font-sans resize-none`}
                     rows="4"
                     value={userAnswer}
                     onChange={(e) => setUserAnswer(e.target.value)}
@@ -262,12 +260,12 @@ const WhatIfExercise = ({ exercise, userAnswer, setUserAnswer, onSubmit, showFee
             </div>
 
             {/* Feedback & Actions */}
-            <div className="p-5 bg-white/[0.02] border-t border-white/5 flex justify-between items-center">
+            <div className="p-5 bg-black/60 border-t border-white/10 flex justify-between items-center">
                 <div>
                     {showFeedback && (
                         <span className={`text-sm font-medium animate-in slide-in-from-left-4 fade-in ${isCorrect ? 'text-green-400' : 'text-red-400'}`}>
-                            {isCorrect 
-                                ? (exercise.successMessage || "¡Excelente análisis!") 
+                            {isCorrect
+                                ? (exercise.successMessage || "¡Excelente análisis!")
                                 : (exercise.errorMessage || "No es correcto. Piensa en el flujo de ejecución.")}
                         </span>
                     )}
@@ -285,10 +283,10 @@ const WhatIfExercise = ({ exercise, userAnswer, setUserAnswer, onSubmit, showFee
 
 // --- Main ExerciseModule Component ---
 
-const ExerciseModule = ({ 
-    exercise, 
-    onComplete, 
-    onNext 
+const ExerciseModule = ({
+    exercise,
+    onComplete,
+    onNext
 }) => {
     const [userAnswer, setUserAnswer] = useState('');
     const [showFeedback, setShowFeedback] = useState(false);
@@ -314,17 +312,17 @@ const ExerciseModule = ({
             case 'fill_blanks':
             case 'fill_code_row':
                 // For fill exercises, compare exact or normalized answers
-                const cleanInput = exercise.caseSensitive 
+                const cleanInput = exercise.caseSensitive
                     ? userAnswer.trim().replace(/\s+/g, ' ')
                     : normalizeAnswer(userAnswer);
                 const cleanExpected = exercise.caseSensitive
                     ? exercise.expectedAnswer.trim().replace(/\s+/g, ' ')
                     : normalizeAnswer(exercise.expectedAnswer);
-                
+
                 // Support multiple correct answers
                 if (exercise.acceptedAnswers && Array.isArray(exercise.acceptedAnswers)) {
-                    correct = exercise.acceptedAnswers.some(ans => 
-                        exercise.caseSensitive 
+                    correct = exercise.acceptedAnswers.some(ans =>
+                        exercise.caseSensitive
                             ? cleanInput === ans.trim().replace(/\s+/g, ' ')
                             : cleanInput === normalizeAnswer(ans)
                     );
@@ -342,7 +340,7 @@ const ExerciseModule = ({
             case 'what_if':
                 // For what_if, can be exact match or keyword-based validation
                 if (exercise.acceptedAnswers && Array.isArray(exercise.acceptedAnswers)) {
-                    correct = exercise.acceptedAnswers.some(ans => 
+                    correct = exercise.acceptedAnswers.some(ans =>
                         normalizeAnswer(userAnswer).includes(normalizeAnswer(ans))
                     );
                 } else {
@@ -398,7 +396,7 @@ const ExerciseModule = ({
                 return <FillCodeRowExercise {...commonProps} />;
 
             case 'test':
-                return <TestExercise 
+                return <TestExercise
                     {...commonProps}
                     selectedOption={userAnswer}
                     setSelectedOption={commonProps.setUserAnswer}

@@ -5,11 +5,11 @@ import { useUser } from '../context/UserContext';
 import { useProject } from '../context/ProjectContext';
 
 const SUGGESTED_TAGS = [
-    'Desarrollo Web',
-    'Data Science',
-    'Machine Learning',
-    'Liderazgo',
-    'Gestión Ágil'
+    'Aplicaciones Web',
+    'Frontend (React/Vue)',
+    'Node.js y APIs',
+    'UX/UI',
+    'Progressive Web Apps'
 ];
 
 const SearchScreen = ({ onNavigate }) => {
@@ -76,10 +76,10 @@ const SearchScreen = ({ onNavigate }) => {
                 </div>
 
                 <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-[#f8fbff] leading-[1.2] drop-shadow-[0_0_20px_rgba(255,255,255,0.1)]">
-                    Impulsa tu <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00c8ff] to-[#0066cc]">Potencial</span>
+                    En qué te puedo ayudar
                 </h1>
                 <p className="text-lg md:text-xl text-[#9bb3d6] max-w-2xl mx-auto font-medium">
-                    Descubre rutas de aprendizaje diseñadas para transformar habilidades y escalar resultados.
+                    Tú dame una idea, yo te doy las herramientas.
                 </p>
             </div>
 
@@ -88,7 +88,7 @@ const SearchScreen = ({ onNavigate }) => {
 
                 {/* Search Input Wrapper */}
                 <div className={`relative group transition-all duration-500 transform ${isFocused ? 'scale-[1.02]' : 'scale-100'}`}>
-                    <div className="relative flex items-center w-full h-16 md:h-20 rounded-full bg-white/5 border border-[#00c8ff]/30 px-6 shadow-[0_15px_40px_rgba(0,0,0,0.5)] overflow-hidden focus-within:ring-2 focus-within:ring-[#00c8ff] transition-all duration-300">
+                    <div className="relative flex items-center w-full h-16 md:h-20 rounded-full bg-black border border-[#00c8ff]/30 px-6 shadow-[0_15px_40px_rgba(0,0,0,0.5)] overflow-hidden focus-within:ring-2 focus-within:ring-[#00c8ff] transition-all duration-300">
                         {/* Search Icon */}
                         <svg className={`w-6 h-6 md:w-8 md:h-8 transition-colors duration-300 ${isFocused ? 'text-[#00c8ff]' : 'text-[#9bb3d6]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -126,7 +126,7 @@ const SearchScreen = ({ onNavigate }) => {
                                     <span>Cargando</span>
                                 </div>
                             ) : (
-                                'Comenzar Ruta'
+                                'Apréndelo'
                             )}
                         </button>
                     </div>
@@ -141,7 +141,7 @@ const SearchScreen = ({ onNavigate }) => {
                         background: 'linear-gradient(120deg, rgba(0, 200, 255, 0.9), rgba(0, 140, 255, 1), rgba(0, 230, 255, 0.9))',
                     } : {}}
                 >
-                    Comenzar Ruta
+                    Aprendélo
                 </button>
 
                 {error && (
@@ -155,6 +155,7 @@ const SearchScreen = ({ onNavigate }) => {
                         </button>
                     </div>
                 )}
+
 
                 {/* Tags Section */}
                 <div className="flex flex-wrap justify-center items-center gap-3">
