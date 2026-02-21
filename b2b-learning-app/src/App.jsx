@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Layout from './components/Layout';
 import SearchScreen from './components/SearchScreen';
 import AssessmentScreen from './components/AssessmentScreen';
-import { AssessmentProvider, useAssessment } from './context/AssessmentContext';
+import { AssessmentProvider } from './context/AssessmentContext';
 
 import RoadmapScreen from './components/RoadmapScreen';
 import LessonScreen from './components/LessonScreen';
@@ -15,6 +15,7 @@ function AppContent() {
   const canGoBack = history.length > 1;
 
   const navigateTo = (screen) => {
+    console.log('Navigating to:', screen);
     setHistory((prev) => [...prev, screen]);
   };
 

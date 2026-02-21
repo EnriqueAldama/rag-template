@@ -91,8 +91,10 @@ const RoadmapNode = ({ module, index, onLessonOpen }) => {
 
 
 // --- Main Screen ---
-const RoadmapScreen = ({ onNavigate, onLessonOpen }) => {
+const RoadmapScreen = ({ onNavigate, onLessonOpen, onBack }) => {
     const [openingLesson, setOpeningLesson] = useState(null);
+
+    console.log('RoadmapScreen rendered');
 
     const handleLessonOpen = (module) => {
         setOpeningLesson(module);

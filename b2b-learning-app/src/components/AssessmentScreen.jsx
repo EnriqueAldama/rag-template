@@ -94,8 +94,10 @@ const AssessmentScreen = ({ onNavigate }) => {
     const { assessmentData, updateSkill } = useAssessment();
 
     const handleGenerate = () => {
+        console.log('Generate clicked, assessment data:', assessmentData);
         setIsGenerating(true);
         setTimeout(() => {
+            console.log('Navigating to roadmap...');
             setIsGenerating(false);
             if (onNavigate) onNavigate();
         }, 1500);
@@ -104,6 +106,8 @@ const AssessmentScreen = ({ onNavigate }) => {
     // previously required at least one skill > 0 in order to continue
     // user should be able to proceed even if all values remain at 0%
     const isReady = true;
+
+    console.log('AssessmentScreen rendered with data:', assessmentData);
 
     return (
         <div className="flex-1 flex flex-col items-center justify-start w-full max-w-4xl mx-auto px-4 py-12 animate-in fade-in duration-700">

@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext } from 'react';
 
-const AssessmentContext = createContext();
+const AssessmentContext = createContext(null);
 
 export const AssessmentProvider = ({ children }) => {
     const [assessmentData, setAssessmentData] = useState({
@@ -20,4 +20,10 @@ export const AssessmentProvider = ({ children }) => {
     );
 };
 
-export const useAssessment = () => useContext(AssessmentContext);
+export const useAssessment = () => {
+    const context = useContext(AssessmentContext);
+    if (!context) {
+        throw new Error('useAssessment must be used within an AssessmentProvider');
+    }
+    return context;
+};
