@@ -3,11 +3,11 @@ import { createClient } from '../api/client';
 import { useAssessment } from '../context/AssessmentContext';
 
 const SUGGESTED_TAGS = [
-    'Desarrollo Web',
-    'Data Science',
-    'Machine Learning',
-    'Liderazgo',
-    'Gestión Ágil'
+    'Aplicaciones Web',
+    'Frontend (React/Vue)',
+    'Node.js y APIs',
+    'UX/UI',
+    'Progressive Web Apps'
 ];
 
 const SearchScreen = ({ onNavigate }) => {
@@ -57,10 +57,10 @@ const SearchScreen = ({ onNavigate }) => {
                 </div>
 
                 <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-[#f8fbff] leading-[1.2] drop-shadow-[0_0_20px_rgba(255,255,255,0.1)]">
-                    Impulsa tu <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00c8ff] to-[#0066cc]">Potencial</span>
+                    En qué te puedo ayudar
                 </h1>
                 <p className="text-lg md:text-xl text-[#9bb3d6] max-w-2xl mx-auto font-medium">
-                    Descubre rutas de aprendizaje B2B diseñadas para transformar habilidades y escalar resultados.
+                    Tú dame una idea, yo te doy las herramientas.
                 </p>
             </div>
 
@@ -136,6 +136,7 @@ const SearchScreen = ({ onNavigate }) => {
                         </button>
                     </div>
                 )}
+
 
                 {/* Tags Section */}
                 <div className="flex flex-wrap justify-center items-center gap-3">

@@ -20,4 +20,12 @@ export const getQuestions = async (payload) => {
   return response.data;
 };
 
+export const tutorChat = async (messages, exerciseContext = '') => {
+  const response = await api.post('/tutor_chat', {
+    messages: messages.map(m => ({ role: m.sender === 'user' ? 'user' : 'assistant', content: m.text })),
+    exercise_context: exerciseContext,
+  });
+  return response.data;
+};
+
 export default api;

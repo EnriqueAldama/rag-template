@@ -27,8 +27,12 @@ function AppContent() {
     });
   };
 
+  const goHome = () => {
+    setHistory(['search']);
+  };
+
   return (
-    <Layout onLogoClick={goBack} canGoBack={canGoBack}>
+    <Layout onLogoClick={goHome} onBackClick={goBack} canGoBack={canGoBack}>
       {currentScreen === 'search' && (
         <SearchScreen onNavigate={() => navigateTo('assessment')} onBack={goBack} />
       )}

@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 @layer base {
+
   /* ensure the viewport elements only scroll when content overflows */
   html,
   body {
@@ -18,5 +19,29 @@
 @layer utilities {
   .glass-panel {
     @apply bg-white/5 backdrop-blur-md border border-white/10;
+  }
+
+  /* Custom thin scrollbar for chat panels */
+  .chat-scroll::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .chat-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .chat-scroll::-webkit-scrollbar-thumb {
+    background: rgba(0, 200, 255, 0.2);
+    border-radius: 999px;
+  }
+
+  .chat-scroll::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 200, 255, 0.5);
+  }
+
+  /* Firefox */
+  .chat-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 200, 255, 0.2) transparent;
   }
 }

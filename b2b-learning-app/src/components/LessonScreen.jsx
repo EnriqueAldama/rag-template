@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ExerciseModule from './ExerciseModule';
+import { tutorChat } from '../api/client';
 
 // --- Mock Data for Leitner Levels ---
 // This data can be replaced with data from backend
@@ -77,11 +78,12 @@ const LEITNER_LEVELS = [
 
 // --- Subcomponents ---
 
-const AITutorChat = () => {
+const AITutorChat = ({ exerciseContext = '' }) => {
     const [messages, setMessages] = useState([
-        { id: 1, sender: 'bot', text: 'Hola. Estoy aquí para asistirte. ¿Tienes alguna pregunta sobre el ejercicio actual?' }
+        { id: 1, sender: 'bot', text: '¡Hola! Soy tu tutor virtual 🤖 Estoy aquí para ayudarte con el ejercicio actual. Pregúntame lo que necesites.' }
     ]);
     const [inputMessage, setInputMessage] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
     const chatEndRef = useRef(null);
 
     // Auto-scroll to bottom
@@ -89,22 +91,33 @@ const AITutorChat = () => {
         chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages]);
 
-    const handleSendMessage = () => {
-        if (!inputMessage.trim()) return;
+    const handleSendMessage = async () => {
+        if (!inputMessage.trim() || isLoading) return;
 
-        // Add user msg
-        const newMsgs = [...messages, { id: Date.now(), sender: 'user', text: inputMessage }];
-        setMessages(newMsgs);
+        const userMsg = { id: Date.now(), sender: 'user', text: inputMessage.trim() };
+        const updatedMsgs = [...messages, userMsg];
+        setMessages(updatedMsgs);
         setInputMessage('');
+        setIsLoading(true);
 
-        // Simulate Bot response
-        setTimeout(() => {
+        try {
+            // Send full history (excluding the initial bot greeting for clarity)
+            const historyToSend = updatedMsgs.filter(m => m.id !== 1);
+            const data = await tutorChat(historyToSend, exerciseContext);
             setMessages(prev => [...prev, {
                 id: Date.now() + 1,
                 sender: 'bot',
-                text: 'Esa es una buena pregunta. Recuerda que declarar variables correctamente mejora la prevensión de errores en código a gran escala. Intenta enfocarte en no permitir re-asignaciones.'
+                text: data.reply || 'No pude procesar tu pregunta. Intenta de nuevo.'
             }]);
-        }, 1500);
+        } catch (err) {
+            setMessages(prev => [...prev, {
+                id: Date.now() + 1,
+                sender: 'bot',
+                text: '⚠️ No pude conectarme al tutor ahora mismo. Revisa tu conexión e intenta de nuevo.'
+            }]);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -112,26 +125,55 @@ const AITutorChat = () => {
             <div className="p-4 border-b border-white/5 bg-white/[0.01] flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <div className="relative">
-                        <div className="w-8 h-8 rounded-full bg-white/5 border border-purple-500/30 flex items-center justify-center">
-                            <span className="text-purple-400 font-semibold text-xs text-center leading-none tracking-tighter">AI</span>
+                        <div className="w-8 h-8 rounded-full bg-[#00c8ff]/10 border border-[#00c8ff]/30 flex items-center justify-center">
+                            <span className="text-[#00c8ff] font-semibold text-xs text-center leading-none tracking-tighter">AI</span>
                         </div>
                         <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-[#09090b]"></div>
                     </div>
-                    <h3 className="font-semibold text-white tracking-tight text-sm">Tutor Virtual B2B</h3>
+                    <div>
+                        <h3 className="font-semibold text-white tracking-tight text-sm">Tutor Virtual</h3>
+                        <p className="text-[10px] text-[#00c8ff]/70">Powered by GPT-4o</p>
+                    </div>
                 </div>
+                {isLoading && (
+                    <div className="flex gap-1 items-center">
+                        <div className="w-1.5 h-1.5 bg-[#00c8ff]/60 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                        <div className="w-1.5 h-1.5 bg-[#00c8ff]/60 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                        <div className="w-1.5 h-1.5 bg-[#00c8ff]/60 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                    </div>
+                )}
             </div>
 
-            <div className="flex-1 p-5 overflow-y-auto space-y-4">
+            <div className="max-h-[420px] p-5 overflow-y-auto space-y-4 scrollbar-thin scrollbar-thumb-[#00c8ff]/20 scrollbar-track-transparent hover:scrollbar-thumb-[#00c8ff]/40">
                 {messages.map((msg) => (
                     <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'} animate-in slide-in-from-bottom-2 fade-in`}>
-                        <div className={`max-w-[85%] px-4 py-2.5 text-[15px] font-normal leading-relaxed shadow-sm ${msg.sender === 'user'
-                                ? 'bg-white/10 text-white rounded-2xl rounded-tr-sm border border-white/10'
-                                : 'bg-white/[0.03] text-gray-300 rounded-2xl rounded-tl-sm border border-purple-500/30'
+                        {msg.sender === 'bot' && (
+                            <div className="w-6 h-6 rounded-full bg-[#00c8ff]/10 border border-[#00c8ff]/30 flex items-center justify-center mr-2 mt-1 shrink-0">
+                                <span className="text-[#00c8ff] text-[8px] font-bold">AI</span>
+                            </div>
+                        )}
+                        <div className={`max-w-[80%] px-4 py-2.5 text-[14px] font-normal leading-relaxed shadow-sm ${msg.sender === 'user'
+                            ? 'bg-white/10 text-white rounded-2xl rounded-tr-sm border border-white/10'
+                            : 'bg-[#00c8ff]/5 text-gray-200 rounded-2xl rounded-tl-sm border border-[#00c8ff]/20'
                             }`}>
                             {msg.text}
                         </div>
                     </div>
                 ))}
+
+                {/* Typing indicator */}
+                {isLoading && (
+                    <div className="flex justify-start animate-in slide-in-from-bottom-2 fade-in">
+                        <div className="w-6 h-6 rounded-full bg-[#00c8ff]/10 border border-[#00c8ff]/30 flex items-center justify-center mr-2 mt-1 shrink-0">
+                            <span className="text-[#00c8ff] text-[8px] font-bold">AI</span>
+                        </div>
+                        <div className="px-4 py-3 bg-[#00c8ff]/5 border border-[#00c8ff]/20 rounded-2xl rounded-tl-sm flex gap-1.5 items-center">
+                            <div className="w-2 h-2 bg-[#00c8ff]/60 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                            <div className="w-2 h-2 bg-[#00c8ff]/60 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                            <div className="w-2 h-2 bg-[#00c8ff]/60 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                        </div>
+                    </div>
+                )}
                 <div ref={chatEndRef} />
             </div>
 
@@ -139,15 +181,17 @@ const AITutorChat = () => {
                 <div className="relative flex items-center">
                     <input
                         type="text"
-                        className="w-full bg-white/5 border border-white/10 focus:border-purple-500/50 rounded-full px-5 py-3 text-sm text-white outline-none transition-colors duration-300 pr-12 placeholder-gray-500"
-                        placeholder="Escribe tu mensaje..."
+                        className="w-full bg-black border border-[#00c8ff]/20 focus:border-[#00c8ff]/60 rounded-full px-5 py-3 text-sm text-white outline-none transition-colors duration-300 pr-12 placeholder-gray-500"
+                        placeholder={isLoading ? 'El tutor está respondiendo...' : 'Pregunta al tutor...'}
                         value={inputMessage}
                         onChange={(e) => setInputMessage(e.target.value)}
                         onKeyDown={(e) => { if (e.key === 'Enter') handleSendMessage(); }}
+                        disabled={isLoading}
                     />
                     <button
                         onClick={handleSendMessage}
-                        className="absolute right-2 p-2 text-gray-400 hover:text-purple-400 transition-colors bg-white/5 hover:bg-white/10 rounded-full"
+                        disabled={isLoading || !inputMessage.trim()}
+                        className="absolute right-2 p-2 text-[#9bb3d6] hover:text-[#00c8ff] transition-colors bg-white/5 hover:bg-[#00c8ff]/10 rounded-full disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                         <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
@@ -163,11 +207,15 @@ const AITutorChat = () => {
 
 const LessonScreen = ({ onNavigate, onBack }) => {
     const [levelIndex, setLevelIndex] = useState(0);
+    const [correctCount, setCorrectCount] = useState(0); // for star rating
 
     const currentLevel = LEITNER_LEVELS[levelIndex];
 
     const handleExerciseComplete = (result) => {
         console.log('Exercise completed:', result);
+        if (result.correct) {
+            setCorrectCount(prev => Math.min(5, prev + 1));
+        }
         // Here you can send the result to backend or update progress
     };
 
@@ -216,8 +264,16 @@ const LessonScreen = ({ onNavigate, onBack }) => {
                             <span className="text-xs font-bold tracking-widest text-purple-400 uppercase bg-purple-500/10 px-3 py-1 rounded-full border border-purple-500/20">
                                 Nivel {currentLevel.level} - {currentLevel.exercise.type.replace('_', ' ').toUpperCase()}
                             </span>
+                            {/* star rating */}
+                            <div className="flex items-center gap-1 mt-2">
+                                {Array.from({ length: 5 }).map((_, i) => (
+                                    <svg key={i} className={`w-5 h-5 ${i < correctCount ? 'text-yellow-400' : 'text-white/20'}`} fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 .587l3.668 7.431L24 9.753l-6 5.847 1.42 8.29L12 19.893l-7.42 3.997L6 15.6 0 9.753l8.332-1.735z" />
+                                    </svg>
+                                ))}
+                            </div>
                         </div>
-                        
+
                         {/* Simple Markdown Parser Simulation */}
                         <div className="prose prose-invert prose-p:text-gray-300 prose-headings:text-white max-w-none">
                             <h2 className="text-2xl md:text-3xl font-bold mb-4 tracking-tight">
@@ -225,10 +281,10 @@ const LessonScreen = ({ onNavigate, onBack }) => {
                             </h2>
                             <p className="font-light leading-relaxed text-[16px] md:text-[17px]">
                                 {currentLevel.theory.split('\n')[1].split('`').map((part, i) =>
-                                    i % 2 === 1 ? 
+                                    i % 2 === 1 ?
                                         <code key={i} className="px-1.5 py-0.5 bg-black/40 rounded-md mx-1 text-purple-300 font-mono text-sm border border-white/10">
                                             {part}
-                                        </code> 
+                                        </code>
                                         : part
                                 )}
                             </p>
@@ -248,7 +304,7 @@ const LessonScreen = ({ onNavigate, onBack }) => {
 
                 {/* RIGHT PANEL: AI Tutor Chat (35%) */}
                 <div className="w-full lg:flex-[3.5] min-h-[500px] lg:min-h-0">
-                    <AITutorChat />
+                    <AITutorChat exerciseContext={`${currentLevel.theory.split('\n')[0].replace('## ', '')} - ${currentLevel.exercise.type}`} />
                 </div>
 
             </div>

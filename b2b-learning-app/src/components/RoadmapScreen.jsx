@@ -27,7 +27,7 @@ const ROADMAP_MODULES = [
     { id: 4, title: 'Arquitectura de APIs en Node.js', status: 'current' },
     { id: 5, title: 'Bases de Datos con SQL', status: 'locked' },
     { id: 6, title: 'Seguridad y Rendimiento', status: 'locked' },
-    { id: 7, title: 'Despliegue y DevOps B2B', status: 'locked' }
+    { id: 7, title: 'Despliegue y DevOps', status: 'locked' }
 ];
 
 const RoadmapNode = ({ module, index, onLessonOpen }) => {
@@ -123,7 +123,7 @@ const RoadmapScreen = ({ onNavigate, onLessonOpen, onBack }) => {
 
             {/* Header */}
             <div className="text-center space-y-4 mb-16 z-20 relative">
-                <span className="text-xs font-bold tracking-widest text-purple-400 uppercase bg-purple-500/10 px-3 py-1 rounded-full border border-purple-500/20">Tu Mapa B2B</span>
+                <span className="text-xs font-bold tracking-widest text-purple-400 uppercase bg-purple-500/10 px-3 py-1 rounded-full border border-purple-500/20">Tu Mapa</span>
                 <h2 className="text-4xl md:text-5xl font-extrabold text-white tracking-tight mt-6">Ruta de Arquitectura</h2>
             </div>
 
