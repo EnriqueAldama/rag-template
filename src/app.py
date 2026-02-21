@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from src.llama_index_template import initialize_index, query_index
 import uvicorn
@@ -14,18 +15,41 @@ from src.firebase_client import firebase_post, firebase_get, firebase_put
 app = FastAPI()
 app.llama_index = initialize_index()
 
+# Allow local frontend dev servers to call the API.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # TODO Añadir prompt
 CURRICULUM_AGENT_SYSTEM_PROMPT = (
-    "You are a curriculum generator. Given a problem description, return a JSON object "
-    "with a single key 'curriculum' whose value is an array of topic objects. "
-    "Each topic object must have: titulo (string), id (number), dificulty_sorting (number), ejercicios (array). "
-    "Do not include any other keys or text."
+    "Eres un experto en descomposicion de aplicaciones web. "
+    "Tu tarea es recibir una idea de app (MVP) y generar un mapa completo de los conocimientos necesarios "
+    "para que un cliente pueda construir la app por si mismo usando React, Node.js y SQL, "
+    "incluyendo HTML y CSS basicos. "
+    "Debes identificar todas las funcionalidades o modulos implicitos y traducirlas en tareas de aprendizaje. "
+    "Reglas: considera conocimientos basicos, tareas un poco generales, "
+    "asigna nivel_dificultad en orden creciente, sin recursos externos ni explicaciones, "
+    "salida solo JSON. "
+    "Formato de salida: objeto JSON con la clave 'curriculum' conteniendo una lista de objetos {titulo, nivel_dificultad}."
 )
 
 EXERCISES_AGENT_SYSTEM_PROMPT = (
-    "You are an exercises generator. Given a topic name and supporting study notes, "
-    "return a JSON object with a single key 'ejercicios' whose value is an array. "
-    "Do not include any other keys or text."
+    "ROLE: EXPERT TECH CURRICULUM DESIGNER. "
+    "Transforma un JSON de entrada con teoria en un set de ejercicios practicos, progresivos y de alta retencion. "
+    "Analiza el campo result e identifica sintaxis critica, logica, manejo de errores e integracion con modulos_previos. "
+    "Reglas: minimo 11 ejercicios por modulo, progresion basico/intermedio/avanzado, "
+    "balance 25% por tipo (fill in the blanks, test, what happens if, fill code row). "
+    "Ejercicios autocontenidos, sin redundancias. "
+    "Salida exclusivamente JSON. "
+    "Esquema: {\"modulo\": \"Nombre\", \"ejercicios\": [{\"titulo\", \"tipo\", \"nivel\", "
+    "\"descripcion_teorica\", \"enunciado\", \"respuesta_correcta\"}]}."
 )
 
 
@@ -111,14 +135,14 @@ def _call_curriculum_agent(payload: Dict[str, Any]) -> Dict[str, Any]:
         content = response.choices[0].message.content
     return json.loads(content)
 
-def _call_exercises_agent(topic: str, notes: str) -> Dict[str, Any]:
+def _call_exercises_agent(notes: str, previous_modules: List[str]) -> Dict[str, Any]:
     client = OpenAI()
     messages = [
         {"role": "system", "content": EXERCISES_AGENT_SYSTEM_PROMPT},
         {
             "role": "user",
             "content": json.dumps(
-                {"topic": topic, "notes": notes},
+                {"result": notes, "modulos_previos": previous_modules},
                 ensure_ascii=True,
             ),
         },
@@ -170,16 +194,30 @@ def create_client():
 def create_project(payload: CurriculumRequest):
     try:
         agent_output = _call_curriculum_agent(payload.model_dump())
-        curriculum = agent_output.get("curriculum")
+        curriculum = agent_output.get("curriculum", agent_output) if isinstance(agent_output, dict) else agent_output
         if not isinstance(curriculum, list):
-            raise HTTPException(502, detail="Agent response missing 'curriculum' list of topics.")
-        for item in curriculum:
+            # Fallback if the agent gave us an object with a different key containing the list
+            if isinstance(agent_output, dict):
+                for val in agent_output.values():
+                    if isinstance(val, list):
+                        curriculum = val
+                        break
+        if not isinstance(curriculum, list):
+            raise HTTPException(502, detail="Agent response must be a JSON list.")
+        normalized = []
+        for index, item in enumerate(curriculum, start=1):
             if not isinstance(item, dict):
                 raise HTTPException(502, detail="Each curriculum item must be an object.")
-            if "titulo" not in item or "id" not in item or "dificulty_sorting" not in item or "ejercicios" not in item:
-                raise HTTPException(502, detail="Topic must include titulo, id, dificulty_sorting, and ejercicios.")
+            if "titulo" not in item or "nivel_dificultad" not in item:
+                raise HTTPException(502, detail="Each item must include titulo and nivel_dificultad.")
+            normalized.append({
+                "titulo": item.get("titulo"),
+                "id": int(index),
+                "dificulty_sorting": int(item.get("nivel_dificultad")),
+                "ejercicios": [],
+            })
 
-        curriculum_record = {"userId": payload.userId, "curriculum": curriculum}
+        curriculum_record = {"userId": payload.userId, "curriculum": normalized}
         curriculum_id = store_curriculum(curriculum_record)
         curriculum_record["id"] = curriculum_id
 
@@ -225,7 +263,12 @@ def get_questions(payload: GetQuestionsRequest):
             raise HTTPException(500, detail="Module title is missing.")
 
         notes = _rag_notes_for_topic(module_title)
-        agent_out = _call_exercises_agent(module_title, notes)
+        previous_modules = [
+            item.get("titulo")
+            for item in topics
+            if isinstance(item, dict) and int(item.get("id", -1)) < payload.idModule
+        ]
+        agent_out = _call_exercises_agent(notes, previous_modules)
         ejercicios = agent_out.get("ejercicios")
         if not isinstance(ejercicios, list):
             raise HTTPException(502, detail="Agent response missing 'ejercicios'.")

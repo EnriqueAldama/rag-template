@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import { useAssessment } from '../context/AssessmentContext';
 
 // --- Icons ---
 const CheckIcon = () => (
@@ -91,11 +92,24 @@ const RoadmapNode = ({ module, index, onLessonOpen }) => {
 
 
 // --- Main Screen ---
-const RoadmapScreen = ({ onNavigate, onLessonOpen }) => {
+const RoadmapScreen = ({ onNavigate, onLessonOpen, onBack }) => {
     const [openingLesson, setOpeningLesson] = useState(null);
+    const { curriculum, setSelectedModuleId } = useAssessment();
+
+    const modules = useMemo(() => {
+        if (Array.isArray(curriculum) && curriculum.length) {
+            return curriculum.map((item, index) => ({
+                id: item.id,
+                title: item.titulo || `MÃ³dulo ${item.id}`,
+                status: index === 0 ? 'current' : 'locked'
+            }));
+        }
+        return ROADMAP_MODULES;
+    }, [curriculum]);
 
     const handleLessonOpen = (module) => {
         setOpeningLesson(module);
+        setSelectedModuleId(module.id);
         setTimeout(() => {
             setOpeningLesson(null);
             if (onLessonOpen) onLessonOpen(module);
@@ -121,7 +135,7 @@ const RoadmapScreen = ({ onNavigate, onLessonOpen }) => {
                 </div>
 
                 {/* Render Nodes */}
-                {ROADMAP_MODULES.map((mod, index) => (
+                {modules.map((mod, index) => (
                     <RoadmapNode
                         key={mod.id}
                         module={mod}

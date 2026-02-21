@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createClient, createProject } from '../api/client';
 import { useAssessment } from '../context/AssessmentContext';
 
 const MOCK_SKILLS = [
@@ -91,14 +92,53 @@ const SkillCard = ({ id, title, description, value, onChange }) => {
 
 const AssessmentScreen = ({ onNavigate }) => {
     const [isGenerating, setIsGenerating] = useState(false);
-    const { assessmentData, updateSkill } = useAssessment();
+    const [error, setError] = useState('');
+    const {
+        assessmentData,
+        updateSkill,
+        userId,
+        setUserId,
+        goalDescription,
+        setCurriculum,
+        setCurriculumId
+    } = useAssessment();
 
-    const handleGenerate = () => {
+    const handleGenerate = async () => {
+        if (isGenerating) return;
         setIsGenerating(true);
-        setTimeout(() => {
-            setIsGenerating(false);
+        setError('');
+        try {
+            let resolvedUserId = userId;
+            if (!resolvedUserId) {
+                const created = await createClient();
+                if (!created?.id) {
+                    throw new Error('No se pudo crear el cliente.');
+                }
+                resolvedUserId = created.id;
+                setUserId(resolvedUserId);
+            }
+
+            if (!goalDescription?.trim()) {
+                throw new Error('Falta la descripciÃ³n del objetivo.');
+            }
+
+            const payload = {
+                description: goalDescription.trim(),
+                userId: resolvedUserId
+            };
+            const response = await createProject(payload);
+            if (!response?.id || !Array.isArray(response?.curriculum)) {
+                throw new Error('Respuesta invÃ¡lida del backend.');
+            }
+            setCurriculumId(response.id);
+            setCurriculum(response.curriculum);
             if (onNavigate) onNavigate();
-        }, 1500);
+        } catch (err) {
+            const message = err?.response?.data?.detail || err?.message || 'Error al generar el mapa.';
+            setError(message);
+        } finally {
+            setIsGenerating(false);
+        }
     };
 
     // previously required at least one skill > 0 in order to continue
@@ -151,6 +191,18 @@ const AssessmentScreen = ({ onNavigate }) => {
                     )}
                 </button>
             </div>
+
+            {error && (
+                <div className="w-full flex flex-col items-center gap-3 pb-10">
+                    <p className="text-sm text-red-400 font-medium text-center">{error}</p>
+                    <button
+                        onClick={handleGenerate}
+                        className="px-5 py-2 rounded-full bg-white/5 border border-white/10 text-white text-sm font-medium hover:bg-white/10 transition-all"
+                    >
+                        Reintentar
+                    </button>
+                </div>
+            )}
 
         </div>
     );
