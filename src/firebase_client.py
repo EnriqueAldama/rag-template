@@ -2,7 +2,9 @@ import os
 import json
 from typing import Any, Dict, Optional
 import requests
+from dotenv import load_dotenv
 
+load_dotenv(override=True)
 
 FIREBASE_DB_URL = os.getenv("FIREBASE_DB_URL", "").rstrip("/")
 FIREBASE_DB_AUTH = os.getenv("FIREBASE_DB_AUTH", "")

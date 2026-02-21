@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from src.llama_index_template import initialize_index, query_index
 import uvicorn
@@ -14,6 +15,17 @@ from src.firebase_client import firebase_post, firebase_get, firebase_put
 
 app = FastAPI()
 app.llama_index = initialize_index()
+# Allow local frontend dev servers to call the API.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class CurriculumRequest(BaseModel):
     description: str = Field(..., min_length=1)
@@ -101,14 +113,14 @@ def _call_curriculum_agent(payload: Dict[str, Any]) -> Dict[str, Any]:
         content = response.choices[0].message.content
     return json.loads(content)
 
-def _call_exercises_agent(topic: str, notes: str) -> Dict[str, Any]:
+def _call_exercises_agent(notes: str, previous_modules: List[str]) -> Dict[str, Any]:
     client = OpenAI()
     messages = [
         {"role": "system", "content": EXERCISES_AGENT_SYSTEM_PROMPT},
         {
             "role": "user",
             "content": json.dumps(
-                {"topic": topic, "notes": notes},
+                {"result": notes, "modulos_previos": previous_modules},
                 ensure_ascii=True,
             ),
         },
