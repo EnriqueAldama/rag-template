@@ -107,6 +107,8 @@ const RoadmapScreen = ({ onNavigate, onLessonOpen, onBack }) => {
         return ROADMAP_MODULES;
     }, [curriculum]);
 
+    console.log('RoadmapScreen rendered');
+
     const handleLessonOpen = (module) => {
         setOpeningLesson(module);
         setSelectedModuleId(module.id);

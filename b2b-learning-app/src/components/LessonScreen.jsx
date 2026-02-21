@@ -1,99 +1,81 @@
 import React, { useState, useEffect, useRef } from 'react';
+import ExerciseModule from './ExerciseModule';
 
 // --- Mock Data for Leitner Levels ---
+// This data can be replaced with data from backend
 const LEITNER_LEVELS = [
     {
         level: 1,
         theory: "## Fundamentos de Variables\nEn JavaScript moderno, preferimos `const` para constantes y `let` para variables mutables. Evitamos usar `var`. Declarar el estado inicial correctamente previene errores de mutación.",
-        codeContextBefore: "function initializeApp() {\n  // Declara una constante para la URL de la API\n",
-        codeContextAfter: "\n  console.log('Connecting to:', API_URL);\n}",
-        expectedAnswer: "const API_URL = 'https://api.empresa.com';",
-        placeholder: "declara la constante aquí...",
-        successMessage: "Excelente. Uso correcto de const."
+        exercise: {
+            id: 'ex1',
+            type: 'fill_blanks',
+            fileName: 'appConfig.js',
+            codeContextBefore: "function initializeApp() {\n  // Declara una constante para la URL de la API\n",
+            codeContextAfter: "\n  console.log('Connecting to:', API_URL);\n}",
+            expectedAnswer: "const API_URL = 'https://api.empresa.com';",
+            placeholder: "declara la constante aquí...",
+            successMessage: "Excelente. Uso correcto de const.",
+            errorMessage: "Recuerda usar const y la sintaxis correcta."
+        }
     },
     {
         level: 2,
         theory: "## Desestructuración de Objetos\nPara un código más limpio al recibir configuraciones complejas, la desestructuración extrae propiedades directamente en variables. Es esencial en React.",
-        codeContextBefore: "const serverConfig = { port: 8080, env: 'production', host: 'localhost' };\n\nfunction startServer() {\n  // Extrae 'port' y 'host' de serverConfig en una sola línea\n",
-        codeContextAfter: "\n  console.log(`Starting on ${host}:${port}`);\n}",
-        expectedAnswer: "const { port, host } = serverConfig;",
-        placeholder: "extrae las propiedades...",
-        successMessage: "Perfecto. Código más profesional."
+        exercise: {
+            id: 'ex2',
+            type: 'test',
+            question: "¿Cuál es la forma correcta de desestructurar 'port' y 'host' del objeto serverConfig?",
+            options: [
+                { key: 'A', text: 'const port, host = serverConfig;' },
+                { key: 'B', text: 'const { port, host } = serverConfig;' },
+                { key: 'C', text: 'const [port, host] = serverConfig;' },
+                { key: 'D', text: 'serverConfig.extract(port, host);' }
+            ],
+            correctAnswer: 'B',
+            successMessage: "¡Correcto! La desestructuración de objetos usa llaves { }.",
+            errorMessage: "Incorrecto. Revisa la sintaxis de desestructuración de objetos."
+        }
     },
     {
         level: 3,
         theory: "## Async / Await Avanzado\nCasi todo I/O en entornos backend requiere asincronía. El patrón async/await simplifica el manejo de Promesas, haciéndolo parecer síncrono y fácil de leer.",
-        codeContextBefore: "async function fetchEnterpriseData(clienteId) {\n  try {\n    // Llama a getData(clienteId) y espera su resultado\n",
-        codeContextAfter: "\n    return result.data;\n  } catch (err) {\n    handleError(err);\n  }\n}",
-        expectedAnswer: "const result = await getData(clienteId);",
-        placeholder: "usa await para obtener los datos...",
-        successMessage: "Brillante. El manejo asíncrono es vital."
+        exercise: {
+            id: 'ex3',
+            type: 'fill_code_row',
+            description: "Completa la función asíncrona para obtener datos del cliente usando await",
+            codeContextBefore: "async function fetchEnterpriseData(clienteId) {\n  try {",
+            codeContextAfter: "    return result.data;\n  } catch (err) {\n    handleError(err);\n  }\n}",
+            expectedAnswer: "const result = await getData(clienteId);",
+            acceptedAnswers: [
+                "const result = await getData(clienteId);",
+                "const result=await getData(clienteId);"
+            ],
+            placeholder: "usa await para obtener los datos...",
+            successMessage: "Brillante. El manejo asíncrono es vital.",
+            errorMessage: "Recuerda usar await antes de la llamada a getData."
+        }
+    },
+    {
+        level: 4,
+        theory: "## Debugging y Análisis de Código\nEs fundamental poder predecir el comportamiento del código antes de ejecutarlo. Esto mejora tus habilidades de debugging y comprensión del flujo de ejecución.",
+        exercise: {
+            id: 'ex4',
+            type: 'what_if',
+            scenario: "Analiza el siguiente código y predice el resultado",
+            code: "let count = 0;\nfor (let i = 0; i < 3; i++) {\n  count += i;\n}\nconsole.log(count);",
+            question: "¿Qué valor se imprime en la consola?",
+            expectedAnswer: "3",
+            acceptedAnswers: ["3", "tres", "0+1+2=3", "el resultado es 3"],
+            placeholder: "Escribe el valor que se imprimirá...",
+            successMessage: "¡Excelente! Comprendes el flujo del bucle.",
+            errorMessage: "Piensa en cómo se acumula el valor en cada iteración."
+        }
     }
 ];
 
+
 // --- Subcomponents ---
-
-const CodeEditorBlock = ({ exercise, userInput, setUserInput, onRun, isCorrect, showFeedback }) => {
-    return (
-        <div className="bg-white/[0.02] border border-white/10 rounded-3xl overflow-hidden font-mono shadow-2xl relative">
-            {/* Editor Header */}
-            <div className="bg-white/[0.03] px-4 py-3 flex items-center gap-2 border-b border-white/5">
-                <div className="flex gap-1.5">
-                    <div className="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
-                    <div className="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
-                    <div className="w-3 h-3 rounded-full bg-[#27c93f]"></div>
-                </div>
-                <span className="text-gray-400 text-xs ml-4 flex-1 text-center font-sans tracking-wide">appConfig.js</span>
-            </div>
-
-            {/* Editor Content */}
-            <div className="p-6 text-[15px] text-[#cccccc] overflow-x-auto leading-relaxed">
-                {/* Context Before */}
-                <pre className="text-gray-500">
-                    <code dangerouslySetInnerHTML={{ __html: exercise.codeContextBefore.replace(/\/\/ (.*)\n/g, '<span class="text-[#6a9955] italic">//$1</span>\n').replace(/function|const|let|async|try|catch|return/g, '<span class="text-[#c586c0]">$&</span>') }}></code>
-                </pre>
-
-                {/* Input Row - Seamless Integration */}
-                <div className="flex items-center group relative my-1">
-                    <span className="w-8 text-right text-purple-400/50 mr-4 select-none pr-2">▶</span>
-                    <input
-                        type="text"
-                        className={`flex-1 bg-transparent border-b ${showFeedback ? (isCorrect ? 'border-green-500 text-green-400' : 'border-red-500 text-red-500') : 'border-white/10 focus:border-purple-500 text-white'} outline-none px-1 py-1 transition-colors duration-300 placeholder-gray-600 font-mono`}
-                        value={userInput}
-                        onChange={(e) => setUserInput(e.target.value)}
-                        placeholder={exercise.placeholder}
-                        spellCheck="false"
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter') onRun();
-                        }}
-                    />
-                </div>
-
-                {/* Context After */}
-                <pre className="text-gray-500">
-                    <code dangerouslySetInnerHTML={{ __html: exercise.codeContextAfter.replace(/console\.log/g, '<span class="text-[#dcdcaa]">console.log</span>') }}></code>
-                </pre>
-            </div>
-
-            {/* Actions */}
-            <div className="p-5 bg-white/[0.02] border-t border-white/5 flex justify-between items-center">
-                <div>
-                    {showFeedback && (
-                        <span className={`text-sm font-medium animate-in slide-in-from-left-4 fade-in ${isCorrect ? 'text-green-400' : 'text-red-400'}`}>
-                            {isCorrect ? exercise.successMessage : "Resultado inesperado. Verifica el código."}
-                        </span>
-                    )}
-                </div>
-                <button
-                    onClick={onRun}
-                    className="px-6 py-2 bg-white/5 hover:bg-purple-600 hover:text-white border border-white/10 hover:border-purple-500 text-gray-300 font-medium rounded-full transition-all duration-300 text-sm active:scale-95"
-                >
-                    Ejecutar
-                </button>
-            </div>
-        </div>
-    );
-};
 
 const AITutorChat = () => {
     const [messages, setMessages] = useState([
@@ -177,33 +159,21 @@ const AITutorChat = () => {
     );
 };
 
-
 // --- Main Screen ---
 
 const LessonScreen = ({ onNavigate, onBack }) => {
     const [levelIndex, setLevelIndex] = useState(0);
-    const [userInput, setUserInput] = useState('');
-    const [showFeedback, setShowFeedback] = useState(false);
-    const [isCorrect, setIsCorrect] = useState(false);
 
-    const currentExercise = LEITNER_LEVELS[levelIndex];
+    const currentLevel = LEITNER_LEVELS[levelIndex];
 
-    const handleVerify = () => {
-        // Strip external spaces to be slightly forgiving
-        const cleanInput = userInput.trim().replace(/\s+/g, ' ');
-        const cleanExpected = currentExercise.expectedAnswer.trim().replace(/\s+/g, ' ');
-
-        const correct = cleanInput === cleanExpected;
-        setIsCorrect(correct);
-        setShowFeedback(true);
+    const handleExerciseComplete = (result) => {
+        console.log('Exercise completed:', result);
+        // Here you can send the result to backend or update progress
     };
 
     const advanceLeitner = () => {
         if (levelIndex < LEITNER_LEVELS.length - 1) {
             setLevelIndex(prev => prev + 1);
-            setUserInput('');
-            setShowFeedback(false);
-            setIsCorrect(false);
         } else {
             alert("¡Has completado todos los niveles de este módulo!");
             onNavigate('roadmap');
@@ -241,33 +211,36 @@ const LessonScreen = ({ onNavigate, onBack }) => {
 
                     {/* Theory Header / Card */}
                     <div className="bg-white/[0.02] border border-white/10 p-8 rounded-3xl backdrop-blur-lg shadow-xl relative overflow-hidden flex flex-col justify-center">
+                        {/* Level Indicator */}
+                        <div className="mb-4">
+                            <span className="text-xs font-bold tracking-widest text-purple-400 uppercase bg-purple-500/10 px-3 py-1 rounded-full border border-purple-500/20">
+                                Nivel {currentLevel.level} - {currentLevel.exercise.type.replace('_', ' ').toUpperCase()}
+                            </span>
+                        </div>
+                        
                         {/* Simple Markdown Parser Simulation */}
                         <div className="prose prose-invert prose-p:text-gray-300 prose-headings:text-white max-w-none">
-                            <h2 className="text-2xl md:text-3xl font-bold mb-4 tracking-tight">{currentExercise.theory.split('\n')[0].replace('## ', '')}</h2>
+                            <h2 className="text-2xl md:text-3xl font-bold mb-4 tracking-tight">
+                                {currentLevel.theory.split('\n')[0].replace('## ', '')}
+                            </h2>
                             <p className="font-light leading-relaxed text-[16px] md:text-[17px]">
-                                {currentExercise.theory.split('\n')[1].split('`').map((part, i) =>
-                                    i % 2 === 1 ? <code key={i} className="px-1.5 py-0.5 bg-black/40 rounded-md mx-1 text-purple-300 font-mono text-sm border border-white/10">{part}</code> : part
+                                {currentLevel.theory.split('\n')[1].split('`').map((part, i) =>
+                                    i % 2 === 1 ? 
+                                        <code key={i} className="px-1.5 py-0.5 bg-black/40 rounded-md mx-1 text-purple-300 font-mono text-sm border border-white/10">
+                                            {part}
+                                        </code> 
+                                        : part
                                 )}
                             </p>
                         </div>
                     </div>
 
-                    {/* Code Exercise : Fill the Row */}
+                    {/* Exercise Module - Supports multiple exercise types */}
                     <div className="flex-1 min-h-[400px] flex flex-col">
-                        <div className="flex items-center gap-2 mb-4 ml-2">
-                            <div className="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></div>
-                            <h3 className="text-sm font-semibold tracking-wide text-gray-400 uppercase">Interactive Env</h3>
-                        </div>
-                        <CodeEditorBlock
-                            exercise={currentExercise}
-                            userInput={userInput}
-                            setUserInput={(val) => {
-                                setUserInput(val);
-                                setShowFeedback(false);
-                            }}
-                            onRun={handleVerify}
-                            isCorrect={isCorrect}
-                            showFeedback={showFeedback}
+                        <ExerciseModule
+                            exercise={currentLevel.exercise}
+                            onComplete={handleExerciseComplete}
+                            onNext={advanceLeitner}
                         />
                     </div>
 

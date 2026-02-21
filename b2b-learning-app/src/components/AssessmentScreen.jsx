@@ -37,6 +37,8 @@ const AssessmentScreen = ({ onNavigate }) => {
         }, 800);
     };
 
+    console.log('AssessmentScreen rendered with data:', assessmentData);
+
     return (
         <div className="flex-1 flex flex-col items-center justify-start w-full max-w-5xl mx-auto px-4 py-8 md:py-12 animate-in fade-in duration-700 relative z-10">
 
