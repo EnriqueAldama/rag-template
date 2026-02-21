@@ -1,0 +1,19 @@
+El agente 1 va a organizar el curriculum a partir de lo indicado por el usuario 
+y nos va a permitir luego consultar al rag
+
+El input es la frase del usuario
+
+El output es:
+{
+  "project": "Twitter clone",
+  "language": "Django",
+  "estimated_difficulty": "intermediate",
+  // Ya en orden de dificultad
+  "required_topics": [
+    "HTTP basics",
+    "Django project structure",
+    "Models and ORM",
+    "User authentication",
+    "Frontend templates"
+  ]
+}
