@@ -1,8 +1,10 @@
 import React from 'react';
+import ParticleBackground from './ParticleBackground';
 
 const Layout = ({ children, onLogoClick, canGoBack }) => {
     return (
-        <div className="min-h-screen bg-[#09090b] text-white flex flex-col font-sans selection:bg-purple-500/30">
+        <div style={{ background: 'linear-gradient(135deg, #0a0e27 0%, #000000 50%, #0a1628 100%)' }} className="min-h-screen text-white flex flex-col font-sans selection:bg-[#0088ff]/30 relative overflow-x-hidden">
+            <ParticleBackground />
 
             {/* Floating Header */}
             <header className="fixed top-6 left-1/2 -translate-x-1/2 w-[90%] max-w-4xl z-50">
@@ -25,17 +27,17 @@ const Layout = ({ children, onLogoClick, canGoBack }) => {
                         onClick={onLogoClick}
                         className="flex items-center gap-3 cursor-pointer"
                     >
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-600 to-purple-400 flex items-center justify-center shadow-lg shadow-purple-500/20">
-                            <span className="text-white font-bold text-sm tracking-tighter">L</span>
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#00c8ff] to-[#0066cc] flex items-center justify-center shadow-[0_0_15px_rgba(0,200,255,0.4)]">
+                            <span className="text-white font-bold text-sm tracking-tighter shadow-[0_0_10px_white]">L</span>
                         </div>
-                        <span className="font-semibold text-lg tracking-tight text-white hidden sm:block">
-                            Lumina<span className="text-purple-400 font-medium">B2B</span>
+                        <span className="font-semibold text-lg tracking-tight text-[#f8fbff] hidden sm:block drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]">
+                            Lumina<span className="text-[#00c8ff] font-medium drop-shadow-[0_0_15px_rgba(0,200,255,0.5)]">B2B</span>
                         </span>
                     </div>
 
                     {/* Nav Links */}
                     <div className="flex items-center gap-6">
-                        <button className="text-sm font-medium text-gray-400 hover:text-white transition-colors">
+                        <button className="text-sm font-medium text-[#9bb3d6] hover:text-[#00c8ff] transition-colors">
                             Dashboard
                         </button>
                         <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center border border-white/5 hover:bg-white/20 transition-colors cursor-pointer">

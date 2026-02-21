@@ -4,8 +4,9 @@ const AssessmentContext = createContext();
 
 export const AssessmentProvider = ({ children }) => {
     const [assessmentData, setAssessmentData] = useState({
-        react: 0,
-        nodejs: 0,
+        javascript: 0,
+        python: 0,
+        htmlcss: 0,
         sql: 0
     });
     const [userId, setUserId] = useState(null);

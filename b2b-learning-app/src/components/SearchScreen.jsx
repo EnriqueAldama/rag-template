@@ -51,15 +51,15 @@ const SearchScreen = ({ onNavigate }) => {
 
             {/* Hero Section */}
             <div className="text-center w-full max-w-3xl space-y-8 mb-16">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-medium tracking-wide mb-2">
-                    <span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></span>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#00c8ff]/10 border border-[#00c8ff]/20 text-[#00c8ff] text-xs font-medium tracking-wide mb-2">
+                    <span className="w-2 h-2 rounded-full bg-[#00c8ff] animate-pulse shadow-[0_0_10px_rgba(0,200,255,0.8)]"></span>
                     PLATAFORMA INTELIGENTE
                 </div>
 
-                <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-white leading-[1.2]">
-                    Impulsa tu <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-purple-600">Potencial</span>
+                <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-[#f8fbff] leading-[1.2] drop-shadow-[0_0_20px_rgba(255,255,255,0.1)]">
+                    Impulsa tu <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00c8ff] to-[#0066cc]">Potencial</span>
                 </h1>
-                <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto font-medium">
+                <p className="text-lg md:text-xl text-[#9bb3d6] max-w-2xl mx-auto font-medium">
                     Descubre rutas de aprendizaje B2B diseñadas para transformar habilidades y escalar resultados.
                 </p>
             </div>
@@ -69,16 +69,16 @@ const SearchScreen = ({ onNavigate }) => {
 
                 {/* Search Input Wrapper */}
                 <div className={`relative group transition-all duration-500 transform ${isFocused ? 'scale-[1.02]' : 'scale-100'}`}>
-                    <div className="relative flex items-center w-full h-16 md:h-20 rounded-full bg-white/5 border border-white/10 px-6 shadow-2xl overflow-hidden focus-within:ring-2 focus-within:ring-purple-500 transition-all duration-300">
+                    <div className="relative flex items-center w-full h-16 md:h-20 rounded-full bg-white/5 border border-[#00c8ff]/30 px-6 shadow-[0_15px_40px_rgba(0,0,0,0.5)] overflow-hidden focus-within:ring-2 focus-within:ring-[#00c8ff] transition-all duration-300">
                         {/* Search Icon */}
-                        <svg className={`w-6 h-6 md:w-8 md:h-8 transition-colors duration-300 ${isFocused ? 'text-purple-400' : 'text-gray-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className={`w-6 h-6 md:w-8 md:h-8 transition-colors duration-300 ${isFocused ? 'text-[#00c8ff]' : 'text-[#9bb3d6]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>
 
                         {/* Input Field */}
                         <input
                             type="text"
-                            className="peer w-full h-full bg-transparent text-white text-lg md:text-xl px-4 md:px-6 outline-none placeholder-gray-500 font-medium"
+                            className="peer w-full h-full bg-transparent text-[#f8fbff] text-lg md:text-xl px-4 md:px-6 outline-none placeholder-[#9bb3d6]/60 font-medium"
                             placeholder="¿Qué quieres aprender hoy?"
                             value={searchQuery}
                             onChange={handleSearchChange}
@@ -93,14 +93,17 @@ const SearchScreen = ({ onNavigate }) => {
                         <button
                             onClick={handleStartRoute}
                             disabled={!searchQuery.trim() || isNavigating}
-                            className={`ml-2 px-6 md:px-8 py-3 rounded-full font-bold tracking-wide text-sm transition-all duration-300 shrink-0 ${searchQuery.trim()
-                                ? 'bg-white text-black hover:bg-gray-200 hover:scale-105 active:scale-95'
-                                : 'bg-white/5 text-gray-500 cursor-not-allowed hidden md:block'
+                            className={`ml-2 px-6 md:px-8 py-3 rounded-full font-bold tracking-wide text-sm transition-all duration-300 shrink-0 border ${searchQuery.trim()
+                                ? 'text-[#020617] border-[rgba(144,224,255,0.8)] hover:-translate-y-1 hover:shadow-[0_4px_15px_rgba(0,200,255,0.5)]'
+                                : 'bg-transparent text-gray-500 border-white/10 cursor-not-allowed hidden md:block'
                                 }`}
+                            style={searchQuery.trim() && !isNavigating ? {
+                                background: 'linear-gradient(120deg, rgba(0, 200, 255, 0.9), rgba(0, 140, 255, 1), rgba(0, 230, 255, 0.9))',
+                            } : {}}
                         >
                             {isNavigating ? (
                                 <div className="flex items-center gap-2">
-                                    <div className="w-4 h-4 rounded-full border-2 border-black border-t-transparent animate-spin" />
+                                    <div className="w-4 h-4 rounded-full border-2 border-[#020617] border-t-transparent animate-spin" />
                                     <span>Cargando</span>
                                 </div>
                             ) : (
@@ -110,11 +113,14 @@ const SearchScreen = ({ onNavigate }) => {
                     </div>
                 </div>
 
-                {/* Mobile Start Button (Visible only on small screens when typing) */}
+                {/* Mobile Start Button */}
                 <button
                     onClick={handleStartRoute}
                     disabled={!searchQuery.trim() || isNavigating}
-                    className={`w-full py-4 rounded-full font-bold tracking-wide text-sm transition-all duration-300 md:hidden ${searchQuery.trim() ? 'opacity-100 bg-white text-black hover:bg-gray-200' : 'opacity-0 h-0 py-0 overflow-hidden'}`}
+                    className={`w-full py-4 rounded-full font-bold tracking-wide text-sm transition-all duration-300 md:hidden border border-[rgba(144,224,255,0.8)] ${searchQuery.trim() ? 'opacity-100 text-[#020617]' : 'opacity-0 h-0 py-0 overflow-hidden'}`}
+                    style={searchQuery.trim() && !isNavigating ? {
+                        background: 'linear-gradient(120deg, rgba(0, 200, 255, 0.9), rgba(0, 140, 255, 1), rgba(0, 230, 255, 0.9))',
+                    } : {}}
                 >
                     Comenzar Ruta
                 </button>
@@ -124,7 +130,7 @@ const SearchScreen = ({ onNavigate }) => {
                         <p className="text-sm text-red-400 font-medium text-center">{error}</p>
                         <button
                             onClick={handleStartRoute}
-                            className="px-5 py-2 rounded-full bg-white/5 border border-white/10 text-white text-sm font-medium hover:bg-white/10 transition-all"
+                            className="px-5 py-2 rounded-full bg-white/5 border border-white/10 text-white text-sm font-medium hover:bg-white/10 transition-all border-[#00c8ff]/50"
                         >
                             Reintentar
                         </button>
@@ -133,14 +139,14 @@ const SearchScreen = ({ onNavigate }) => {
 
                 {/* Tags Section */}
                 <div className="flex flex-wrap justify-center items-center gap-3">
-                    <span className="text-sm text-gray-500 font-medium mr-2">Sugerencias:</span>
+                    <span className="text-sm text-[#9bb3d6] font-medium mr-2">Sugerencias:</span>
                     {SUGGESTED_TAGS.map((tag) => (
                         <button
                             key={tag}
                             onClick={() => handleTagClick(tag)}
                             className={`px-4 py-2 rounded-full text-sm font-medium border transition-all duration-300 ${searchQuery === tag
-                                ? 'border-purple-500 bg-purple-600 text-white shadow-lg shadow-purple-500/20'
-                                : 'border-white/10 bg-transparent text-gray-400 hover:bg-purple-600 hover:border-purple-500 hover:text-white hover:shadow-lg hover:shadow-purple-500/20'
+                                ? 'border-[#00c8ff] bg-[#00c8ff]/20 text-[#00c8ff] shadow-[0_0_15px_rgba(0,200,255,0.3)]'
+                                : 'border-[#00c8ff]/20 bg-transparent text-[#9bb3d6] hover:bg-[#00c8ff]/10 hover:border-[#00c8ff]/50 hover:text-[#00c8ff] hover:shadow-[0_0_10px_rgba(0,200,255,0.2)]'
                                 }`}
                         >
                             {tag}
