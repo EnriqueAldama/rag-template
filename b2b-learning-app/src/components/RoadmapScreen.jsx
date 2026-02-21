@@ -133,7 +133,7 @@ const RoadmapScreen = ({ onNavigate, onLessonOpen }) => {
                 {/* Back Button */}
                 <div className="absolute bottom-0 z-20">
                     <button
-                        onClick={onNavigate}
+                        onClick={onBack || onNavigate}
                         className="px-8 py-3 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-full font-medium transition-all duration-300"
                     >
                         Volver al Inicio

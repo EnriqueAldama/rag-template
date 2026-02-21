@@ -101,7 +101,9 @@ const AssessmentScreen = ({ onNavigate }) => {
         }, 1500);
     };
 
-    const isReady = Object.values(assessmentData).some(val => val > 0);
+    // previously required at least one skill > 0 in order to continue
+    // user should be able to proceed even if all values remain at 0%
+    const isReady = true;
 
     return (
         <div className="flex-1 flex flex-col items-center justify-start w-full max-w-4xl mx-auto px-4 py-12 animate-in fade-in duration-700">
@@ -133,10 +135,10 @@ const AssessmentScreen = ({ onNavigate }) => {
             <div className="w-full flex justify-center pb-20 mt-8">
                 <button
                     onClick={handleGenerate}
-                    disabled={!isReady || isGenerating}
-                    className={`px-12 py-5 rounded-full font-bold text-lg tracking-wide transition-all duration-500 flex items-center gap-3 ${isReady
+                    disabled={isGenerating}
+                    className={`px-12 py-5 rounded-full font-bold text-lg tracking-wide transition-all duration-500 flex items-center gap-3 ${!isGenerating
                         ? 'bg-white text-black hover:bg-gray-200 hover:scale-105 active:scale-95 shadow-xl'
-                        : 'bg-white/5 text-gray-500 cursor-not-allowed hidden md:flex'
+                        : 'bg-white/5 text-gray-500 cursor-not-allowed'
                         }`}
                 >
                     {isGenerating ? (

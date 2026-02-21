@@ -180,7 +180,7 @@ const AITutorChat = () => {
 
 // --- Main Screen ---
 
-const LessonScreen = ({ onNavigate }) => {
+const LessonScreen = ({ onNavigate, onBack }) => {
     const [levelIndex, setLevelIndex] = useState(0);
     const [userInput, setUserInput] = useState('');
     const [showFeedback, setShowFeedback] = useState(false);
@@ -212,6 +212,18 @@ const LessonScreen = ({ onNavigate }) => {
 
     return (
         <div className="flex-1 w-full flex flex-col items-center py-6 px-4 md:px-8 max-w-[1400px] mx-auto animate-in fade-in duration-700 h-full relative">
+            {/* Optional back arrow inside lesson */}
+            {onBack && (
+                <button
+                    onClick={onBack}
+                    className="absolute top-6 left-6 p-2 rounded-full bg-white/5 hover:bg-white/10 transition-colors"
+                    aria-label="Volver"
+                >
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+            )}
 
             {/* Hidden Dev Demo Button - Leitner Simulation */}
             <button

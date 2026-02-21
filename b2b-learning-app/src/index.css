@@ -3,6 +3,13 @@
 @tailwind utilities;
 
 @layer base {
+  /* ensure the viewport elements only scroll when content overflows */
+  html,
+  body {
+    height: 100%;
+    overflow-y: auto;
+  }
+
   body {
     @apply bg-slate-950 text-white font-sans antialiased selection:bg-purple-500/30 selection:text-white;
   }
